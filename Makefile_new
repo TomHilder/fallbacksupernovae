@@ -1,0 +1,185 @@
+#######################################################################################################
+####################### Praeprozessor-Schalter #########################################################
+#######################################################################################################
+
+GITTER_OPTS = -DNX=200 -DNY=32 -DNZ=1 -UAEQUATOR -UOKTANT -DNDIM=2 -DLOG_GITTER -DR_MIN=4.0d4 -DRADIUS=2.0d8 -UN_R_SPHAER=5
+
+GEOM_OPTS   = -DGEOM=1
+
+HYDRO_OPTS  = -DCFL_KRIT=0.4d0 -UALLES_SPEICHERN -DRHO_MIN_FAC=1.0d-14
+
+EOS_OPTS    = -DEOS_TYP=2
+
+GRAV_OPTS   = -DENE_CONS_2
+
+RAND_OPTS   = -DRAND_MODUS=1 -UATMOSPHAERE
+
+DEBUG_OPTS  = -DCONS_TEST
+
+MACRO_DEFS  = $(GITTER_OPTS) $(RAND_OPTS) $(HYDRO_OPTS) $(EOS_OPTS) $(GRAV_OPTS) $(DEBUG_OPTS) $(GEOM_OPTS)
+
+PERFORMANCE_MESSEN = 0
+
+
+
+
+
+#######################################################################################################
+####################### Kompilierung auf verschiedenen Maschinen #######################################
+#######################################################################################################
+
+ifeq ($(OSTYPE),linux)
+
+FC      = ifort -c
+FL      = ifort
+FPP     = cpp -P -traditional
+
+FLTFL   = -r8
+
+FC_OPTS = -O3 -opt-report -vec-report3 -openmp #-mcpu=pentiumpro
+FL_OPTS = $(FC_OPTS)
+
+CPP_ARCH_OPTS =
+
+ifeq ($(PERFORMANCE_MESSEN),1)
+PRFFL = -qp
+PRFPP = 
+else
+PRFFL =
+PRFPP =
+endif
+
+endif
+
+
+#-------------------------------------------------------------------------------------
+#ifeq ($(OSTYPE),darwin9.0)
+
+FC      = gfortran -c
+FL      = gfortran
+FPP     = cpp -P -traditional
+
+FLTFL   = -fdefault-real-8
+
+FC_OPTS = -O3 -openmp #-mcpu=pentiumpro
+FL_OPTS = $(FC_OPTS)
+
+CPP_ARCH_OPTS =
+
+ifeq ($(PERFORMANCE_MESSEN),1)
+PRFFL = 
+PRFPP = 
+else
+PRFFL =
+PRFPP =
+endif
+
+#endif
+
+
+#-------------------------------------------------------------------------------------
+
+ifeq ($(OSTYPE),aix)
+FC      = xlf90_r -c -qfixed  
+FL      = xlf90_r  
+FPP     = cpp -P -traditional
+
+
+FLTFL   = -q64  -qautodbl=dbl4  -qdpc 
+FC_OPTS = -O5 -qarch=auto -qtune=auto -qthreaded -qsmp=omp:noauto -qreport=smplist\
+	-qnosave 
+FL_OPTS = $(FC_OPTS)
+
+CPP_ARCH_OPTS = 
+
+ifeq ($(PERFORMANCE_MESSEN),1)
+PRFFL = -pg
+PRFPP = #-DPERF_IBM
+else
+PRFFL = 
+PRFPP =
+endif
+endif
+
+#-------------------------------------------------------------------------------------
+ifeq ($(HOST),a1)
+
+FLTFL=-Wf"-A idbl4"
+
+FC_OPTS=-Chopt -P openmp  \
+               -Wf"-pvctl vr256 fullmsg noassume loopcnt=100000" \
+	       -pi auto line=10000 exp=van_leer,fluesse,randbed \
+               -sx8
+FL_OPTS=$(FC_OPTS)
+
+FC      = sxf90 -c
+FL      = sxf90
+FPP     = cpp -P -traditional
+
+CPP_ARCH_OPTS = -DNEC
+
+ifeq ($(PERFORMANCE_MESSEN),1)
+PRFFL   = -ftrace
+PRFPP   = 
+else
+PRFFL   =
+PRFPP   =
+endif
+
+INC_PTH =-I/afs/rzg/@sys/include
+FLIBS   =-L/afs/rzg/@sys/lib
+
+endif
+
+FC_STR  = $(FC) $(FLTFL) $(FC_OPTS) $(PRFFL) $(INC_PATH)
+FL_STR  = $(FL) $(FLTFL) $(FL_OPTS) $(PRFFL) $(FLIBS)
+FP_STR  = $(FPP) $(INC_PATH) $(PRFPP) $(CPP_ARCH_OPTS)
+
+
+tvd.x: tvd.o advec.o ausgabe.o eos.o heizen.o init.o mod_grav.o mod_hydro.o poisson.o
+	$(FL_STR) -o tvd.x tvd.o advec.o ausgabe.o eos.o heizen.o init.o \
+	mod_grav.o mod_hydro.o poisson.o
+
+tvd.o:	tvd.F mod_hydro.o advec.o ausgabe.o heizen.o mod_grav.o poisson.o
+	$(FP_STR) $(MACRO_DEFS) tvd.F >  tvd.f
+	$(FC_STR) tvd.f
+
+advec.o: advec.F ausgabe.o eos.o mod_grav.o mod_hydro.o mod_grav.o poisson.o
+	$(FP_STR) $(MACRO_DEFS) advec.F >  advec.f
+	$(FC_STR) advec.f
+
+ausgabe.o: ausgabe.F mod_hydro.o mod_grav.o
+	$(FP_STR) $(MACRO_DEFS) ausgabe.F >  ausgabe.f
+	$(FC_STR) ausgabe.f
+
+eos.o: eos.F mod_hydro.o
+	$(FP_STR) $(MACRO_DEFS) eos.F eos.f
+	$(FC_STR) eos.f
+
+heizen.o: heizen.F mod_hydro.o
+	$(FP_STR) $(MACRO_DEFS) heizen.F >  heizen.f
+	$(FC_STR) heizen.f
+
+init.o: init.F mod_hydro.o
+	$(FP_STR) $(MACRO_DEFS) init.F >  init.f
+	$(FC_STR) init.f
+
+poisson.o: poisson.F mod_grav.o mod_hydro.o
+	$(FP_STR) $(MACRO_DEFS) poisson.F >  poisson.f
+	$(FC_STR) poisson.f
+
+mod_grav.o: mod_grav.F
+	$(FP_STR) $(MACRO_DEFS) mod_grav.F >  mod_grav.f
+	$(FC_STR) mod_grav.f
+
+mod_hydro.o: mod_hydro.F
+	$(FP_STR) $(MACRO_DEFS) mod_hydro.F >  mod_hydro.f
+	$(FC_STR) mod_hydro.f
+
+clean:
+	rm -f *.o *.f *.mod
+
+
+
+
+
