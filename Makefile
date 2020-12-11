@@ -43,7 +43,7 @@ CPP_ARCH_OPTS =
 
 ifeq ($(PERFORMANCE_MESSEN),1)
 PRFFL = -qp
-PRFPP = 
+PRFPP =
 else
 PRFFL =
 PRFPP =
@@ -61,15 +61,15 @@ FPP     = cpp -P -traditional
 
 FLTFL   = -fdefault-real-8
 
-FC_OPTS = -O3 #-fopenmp 
+FC_OPTS = -O3 #-fopenmp
 #FC_OPTS = -g -O0 -fcheck=all -fbounds-check -finit-real=snan -fbacktrace -fbounds-check -ffpe-trap=invalid
 FL_OPTS = $(FC_OPTS)
 
 CPP_ARCH_OPTS =
 
 ifeq ($(PERFORMANCE_MESSEN),1)
-PRFFL = 
-PRFPP = 
+PRFFL =
+PRFPP =
 else
 PRFFL =
 PRFPP =
@@ -81,23 +81,23 @@ endif
 #-------------------------------------------------------------------------------------
 
 ifeq ($(OSTYPE),aix)
-FC      = xlf90_r -c -qfixed  
-FL      = xlf90_r  
+FC      = xlf90_r -c -qfixed
+FL      = xlf90_r
 FPP     = cpp -P -traditional
 
 
-FLTFL   = -q64  -qautodbl=dbl4  -qdpc 
+FLTFL   = -q64  -qautodbl=dbl4  -qdpc
 FC_OPTS = -O5 -qarch=auto -qtune=auto -qthreaded -qsmp=omp:noauto -qreport=smplist\
-	-qnosave 
+	-qnosave
 FL_OPTS = $(FC_OPTS)
 
-CPP_ARCH_OPTS = 
+CPP_ARCH_OPTS =
 
 ifeq ($(PERFORMANCE_MESSEN),1)
 PRFFL = -pg
 PRFPP = #-DPERF_IBM
 else
-PRFFL = 
+PRFFL =
 PRFPP =
 endif
 endif
@@ -121,7 +121,7 @@ CPP_ARCH_OPTS = -DNEC
 
 ifeq ($(PERFORMANCE_MESSEN),1)
 PRFFL   = -ftrace
-PRFPP   = 
+PRFPP   =
 else
 PRFFL   =
 PRFPP   =
@@ -149,7 +149,7 @@ Fadvec.o: advec.F Fausgabe.o Feos.o Fmod_grav.o Fmod_hydro.o Fmod_grav.o Fpoisso
 	$(FP_STR) $(MACRO_DEFS) advec.F > Fadvec.f
 	$(FC_STR) Fadvec.f
 
-Fausgabe.o: ausgabe.F Fmod_hydro.o Fmod_grav.o Makefile
+Fausgabe.o: ausgabe.F Fmod_hydro.o Fmod_grav.o Feos.o Makefile
 	$(FP_STR) $(MACRO_DEFS) ausgabe.F > Fausgabe.f
 	$(FC_STR) Fausgabe.f
 
@@ -179,8 +179,3 @@ Fmod_hydro.o: mod_hydro.F Makefile
 
 clean:
 	rm -f *.o *.f *.mod
-
-
-
-
-

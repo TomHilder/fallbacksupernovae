@@ -27,6 +27,7 @@ c     ============================================================
       USE gitter_var
       USE grav_var
       USE param_var
+      USE mod_eos
 
       IMPLICIT NONE
 
@@ -40,11 +41,23 @@ c     ============================================================
 
       do i=1,800
 
+      ! Recompute EOS so it may be outputted:
 
-         write(1,'(8(E16.7))') r(i),u(i,1/2+1,1,0),
+          eps(i,0,0)=u(i,0,0,4)-
+     +        0.5d0*(u(i,0,0,1)**2+u(i,0,0,2)**2+
+     +        u(i,0,0,3)**2)/u(i,0,0,0)
+          eps(i,0,0)=max(eps(i,0,0),0.0d0)
+      call eos(u(i,0,0,0),eps(i,0,0),p(i,0,0),c_s(i,0,0),2)
+
+      ! output columns: radius, density, velocity (momentum density/density),
+      !   ???, energy (energy density/density), grav potential, grav acc, time,
+      !   pressure, sound speed,
+
+         write(1,'(10(E16.7))') r(i),u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,1)/u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,3)/u(i,1/2+1,1,0),
-     +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit
+     +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
+     +        p(i,0,0),c_s(i,0,0)
       end do
 c      do i=1,1
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),
