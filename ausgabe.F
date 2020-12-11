@@ -21,14 +21,28 @@ c     ============================================================
       IMPLICIT NONE
 
       integer, intent(in) :: istep
-      integer :: i
-      real :: eps_tmp
+      integer :: i, j, k
+      real :: eps_tmp, e_ges, e_grav
+      real, dimension(0:NX) :: m_enclosed
       character(len=8) :: num
 
       WRITE(num,'(I8.8)') istep
       OPEN (1, FILE = 'output'//num//'.dat', FORM = 'FORMATTED')
 
+      e_ges=(sum(u(1:NX,1:NY,1:NZ,4)*dv(1:NX,1:NY,1:NZ)))*sym_fac
+      e_grav=0.5d0*sum(u(1:NX,1:NY,1:NZ,0)*dv(1:NX,1:NY,1:NZ)*
+     +     phi_grav(1:NX,1:NY,1:NZ))*sym_fac
+
+      m_enclosed(0) = m_core ! mass coordinate calcs:
       do i=1,NX
+        m_enclosed(i) = m_enclosed(i-1)
+        do j = 1, NY
+          do k = 1, NZ
+            m_enclosed(i) = m_enclosed(i) + u(i,j,k,0)*dv(i,j,k)
+     +        *sym_fac
+          enddo
+        enddo
+
 #if EOS_TYP==1
          eps_tmp=max(1.0d-50,eps(i,NY/2+1,1)-
      +        (k_poly_e*u(i,NY/2,NZ/2,0)**gamma_e*gamma_e_m1_r+
@@ -47,13 +61,14 @@ c     ============================================================
 
       ! output columns: radius, density, velocity (momentum density/density),
       !   ???, energy (energy density/density), grav potential, grav acc, time,
-      !   pressure, sound speed,
+      !   pressure, sound speed, mass coordinate, E_tot
 
-         write(1,'(10(E16.7))') r(i),u(i,NY/2+1,1,0),
+         write(1,'(12(E16.7))') r(i),u(i,NY/2+1,1,0),
      +        u(i,NY/2+1,1,1)/u(i,NY/2+1,1,0),
      +        u(i,NY/2+1,1,3)/u(i,NY/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
-     +        p(i,NY/2+1,1),c_s(i,NY/2+1,1)
+     +        p(i,NY/2+1,1),c_s(i,NY/2+1,1),m_enclosed(i),
+     +        0*e_ges+e_grav+0*verlust_etot*sym_fac
       end do
 c      do i=1,NY
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),
