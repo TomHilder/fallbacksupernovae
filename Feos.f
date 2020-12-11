@@ -10,7 +10,7 @@
 
 
       MODULE mod_eos
-      
+
       IMPLICIT NONE
 
       CONTAINS

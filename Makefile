@@ -149,7 +149,7 @@ Fadvec.o: advec.F Fausgabe.o Feos.o Fmod_grav.o Fmod_hydro.o Fmod_grav.o Fpoisso
 	$(FP_STR) $(MACRO_DEFS) advec.F > Fadvec.f
 	$(FC_STR) Fadvec.f
 
-Fausgabe.o: ausgabe.F Fmod_hydro.o Fmod_grav.o Feos.o Makefile
+Fausgabe.o: ausgabe.F Feos.o Fmod_hydro.o Fmod_grav.o Makefile
 	$(FP_STR) $(MACRO_DEFS) ausgabe.F > Fausgabe.f
 	$(FC_STR) Fausgabe.f
 

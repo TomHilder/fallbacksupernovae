@@ -32,7 +32,7 @@ c     ===============================================================
 c     ---------------------------------------------------------------
 c     Erster Runge-Kutta-Schritt
 c     ---------------------------------------------------------------
-      
+
 c     Randbedingungen setzen:
       call randbed(1)
       call fluesse(1)
@@ -80,12 +80,12 @@ c            c(:,j,k)=maxval(c(:,j,k))
 #if 1
 #if NDIM==3
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)
 #endif
       do k=1,NZ
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=1,NY
 
@@ -153,12 +153,12 @@ c     Randbedingungen setzen:
 c     Flux-Freezing-Geschwindigkeit:
 #if NDIM==3
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)
 #endif
       do k=1,NZ
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=1,NY
             do i=-1,NX+2
@@ -305,18 +305,18 @@ c     =============================================================
 c     ---------------------------------------------------------------
 c     Erster Runge-Kutta-Schritt
 c     ---------------------------------------------------------------
-      
+
 c     Randbedingungen setzen:
       call randbed(2)
       call fluesse(2)
 #if NDIM==3
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)
 #endif
       do k=1,NZ
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=-1,NY+2
             do i=1,NX
@@ -349,12 +349,12 @@ c     Flux-Freezing-Geschwindigkeit:
 
 #if NDIM==3
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,k,l,rho,vx,vy,vz)
 #endif
       do k=1,NZ
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=-1,NY+1
             do i=1,NX
@@ -370,7 +370,7 @@ c     Flux-Freezing-Geschwindigkeit:
 c     Updates der erhaltenene Groessen:
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=-1,NY+1
             do i=1,NX
@@ -429,12 +429,12 @@ c     Randbedingungen setzen:
 c     Flux-Freezing-Geschwindigkeit:
 #if NDIM==3
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,k,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,k,rho,vx,vy,vz)
 #endif
       do k=1,NZ
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=-1,NY+2
             do i=1,NX
@@ -449,7 +449,7 @@ c     Flux-Freezing-Geschwindigkeit:
 
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l)         
+!$OMP& PRIVATE(i,j,l)
 #endif
          do j=0,NY+1
             do l=0,4
@@ -466,7 +466,7 @@ c     Flux-Freezing-Geschwindigkeit:
 
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=0,NY
             do i=1,NX
@@ -483,7 +483,7 @@ c     Flux-Freezing-Geschwindigkeit:
 c     Updates der erhaltenene Groessen:
 #if NDIM==2
 !$OMP PARALLEL DO
-!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)         
+!$OMP& PRIVATE(i,j,l,rho,vx,vy,vz)
 #endif
          do j=1,NY
             do i=1,NX
@@ -572,7 +572,7 @@ c     ===============================================================
 c     ---------------------------------------------------------------
 c     Erster Runge-Kutta-Schritt
 c     ---------------------------------------------------------------
-      
+
 c     Randbedingungen setzen:
       call randbed(3)
       call fluesse(3)
@@ -632,7 +632,7 @@ c            do i=1,NX
             end do
          end do
       end do
-         
+
 
 c     Updates der erhaltenene Groessen:
 !$OMP PARALLEL DO
@@ -693,7 +693,7 @@ c     Flux-Freezing-Geschwindigkeit:
          end do
       end do
 
-!$OMP PARALLEL DO      
+!$OMP PARALLEL DO
 !$OMP& PRIVATE(i,j,k,l)
       do k=0,NZ+1
          do j=1,NY
@@ -785,9 +785,9 @@ c     ===============================================================
 c     ===============================================================
 
       IMPLICIT NONE
-      
+
       real :: a,b
-      
+
       if (a*b.gt.0.0d0) then
          van_leer=2.0d0*a*b/(a+b) !van Leer
 c         van_leer=sign(min(abs(a),abs(b)),a) !Minmod
@@ -806,7 +806,7 @@ c     ===============================================================
 
       SUBROUTINE randbed(richtung)
 
-c     ===============================================================    
+c     ===============================================================
 
       USE grav_var
       USE hydro_var
@@ -815,9 +815,9 @@ c     ===============================================================
       IMPLICIT NONE
 
       integer, intent(in) :: richtung
-      
+
       integer :: i,j,k
-      
+
       select case(richtung)
 
 c     ---------------------------------------------------------------
@@ -832,7 +832,7 @@ c     r-Richtung:
             do j=1,NY
 c     Hydro-Groessen:
 #if RAND_MODUS<2
-c     Innenrand:               
+c     Innenrand:
 c               u( 0,j,k,:)=u(1,j,k,:)
 c               u(-1,j,k,:)=u(2,j,k,:)
 c               u( 0,j,k,1)=-u(1,j,k,1)
@@ -894,7 +894,7 @@ c     Gravitationsfeld:
                phi_grav(-1,j,k)=phi_grav(2,j,k)
                phi_grav(NX+1,j,k)=phi_grav(NX,j,k)
                phi_grav(NX+2,j,k)=phi_grav(NX,j,k)
-               
+
             end do
          end do
 
@@ -928,7 +928,7 @@ c     Hydro-Groessen:
 #ifdef AEQUATOR
                u(i,NY+1,k,2)= u(i,NY  ,k,2)
                u(i,NY+2,k,2)= u(i,NY-1,k,2)
-#else 
+#else
                u(i,NY+1,k,2)=-u(i,NY  ,k,2)
                u(i,NY+2,k,2)=-u(i,NY-1,k,2)
 #endif
@@ -967,7 +967,7 @@ c     Hydro-Groessen:
                u(i,j,-1,3)= u(i,j,NZ-1,3)
                u(i,j, 0,4)= u(i,j,NZ  ,4)
                u(i,j,-1,4)= u(i,j,NZ-1,4)
-               
+
                u(i,j,NZ+1,0)= u(i,j,1,0)
                u(i,j,NZ+2,0)= u(i,j,2,0)
                u(i,j,NZ+1,1)= u(i,j,1,1)
@@ -1001,7 +1001,7 @@ c     ===============================================================
 
       SUBROUTINE fluesse(richtung)
 
-c     =============================================================== 
+c     ===============================================================
 
       USE hydro_var
       USE grav_var
@@ -1113,19 +1113,19 @@ c     Phi-Impulsfluss zu Drehimpulsfluss konvertieren:
 
       END SUBROUTINE fluesse
 
-c     =============================================================== 
+c     ===============================================================
 
 
 
- 
 
 
 
-c     =============================================================== 
+
+c     ===============================================================
 
       SUBROUTINE zeitschritt(c)
 
-c     =============================================================== 
+c     ===============================================================
 
       USE hydro_var
       USE gitter_var
@@ -1168,18 +1168,18 @@ c     ===============================================================
 #endif
       dt=cfl_factor*dt
 
-      END SUBROUTINE zeitschritt 
+      END SUBROUTINE zeitschritt
 
-c     =============================================================== 
-
-
+c     ===============================================================
 
 
-c     =============================================================== 
+
+
+c     ===============================================================
 
       SUBROUTINE hydro_speichern
 
-c     =============================================================== 
+c     ===============================================================
 
       USE hydro_var
       USE hydro_sav_var
@@ -1192,7 +1192,7 @@ c     ===============================================================
 #if NDIM==2
 !$OMP PARALLEL DO
 !$OMP& PRIVATE(j)
-!$OMP& SHARED(k)         
+!$OMP& SHARED(k)
 #endif
          do j=1,NY
             u_sav(1:NX,j,k,0)=u(1:NX,j,k,0)
@@ -1207,7 +1207,7 @@ c     ===============================================================
 
       END SUBROUTINE hydro_speichern
 
-c     =============================================================== 
+c     ===============================================================
 
 
 #ifdef ATMOSPHAERE
@@ -1245,11 +1245,11 @@ c     ===============================================================
 #endif
 
 
-c     =============================================================== 
+c     ===============================================================
 
       SUBROUTINE courant_factor
 
-c     =============================================================== 
+c     ===============================================================
 
       USE hydro_var
       USE hydro_sav_var
@@ -1266,7 +1266,7 @@ c     ===============================================================
 #if NDIM==2
 !$OMP PARALLEL DO
 !$OMP& PRIVATE(j)
-!$OMP& SHARED(k)         
+!$OMP& SHARED(k)
 #endif
          do j=1,NY
             drho_rho(1:NX,j,k)=
@@ -1285,8 +1285,8 @@ c     ===============================================================
 #if NDIM==2
 !$OMP PARALLEL DO
 !$OMP& PRIVATE(j)
-!$OMP& SHARED(k) 
-!$OMP& REDUCTION(max:drho_rho_max)        
+!$OMP& SHARED(k)
+!$OMP& REDUCTION(max:drho_rho_max)
 #endif
          do j=1,NY
             do i=1,NX
@@ -1317,7 +1317,7 @@ c         stop 'CFL-Faktor zu klein!'
 
       END SUBROUTINE courant_factor
 
-c     =============================================================== 
+c     ===============================================================
 
 
 

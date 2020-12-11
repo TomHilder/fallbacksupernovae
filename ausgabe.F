@@ -38,11 +38,12 @@ c     ============================================================
 
       ! Recompute EOS so it may be outputted:
 
-          eps(i,0,0)=u(i,0,0,4)-
-     +        0.5d0*(u(i,0,0,1)**2+u(i,0,0,2)**2+
-     +        u(i,0,0,3)**2)/u(i,0,0,0)
-          eps(i,0,0)=max(eps(i,0,0),0.0d0)
-      call eos(u(i,0,0,0),eps(i,0,0),p(i,0,0),c_s(i,0,0),2)
+          eps(i,NY/2+1,1)=u(i,NY/2+1,1,4)-
+     +        0.5d0*(u(i,NY/2+1,1,1)**2+u(i,NY/2+1,1,2)**2+
+     +        u(i,NY/2+1,1,3)**2)/u(i,NY/2+1,1,0)
+          eps(i,NY/2+1,1)=max(eps(i,NY/2+1,1),0.0d0)
+          call eos(u(i,NY/2+1,1,0),eps(i,NY/2+1,1),p(i,NY/2,1),
+     +        c_s(i,NY/2,1),0)
 
       ! output columns: radius, density, velocity (momentum density/density),
       !   ???, energy (energy density/density), grav potential, grav acc, time,
@@ -52,7 +53,7 @@ c     ============================================================
      +        u(i,NY/2+1,1,1)/u(i,NY/2+1,1,0),
      +        u(i,NY/2+1,1,3)/u(i,NY/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
-     +        p(i,0,0),c_s(i,0,0)
+     +        p(i,NY/2+1,1),c_s(i,NY/2+1,1)
       end do
 c      do i=1,NY
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),
