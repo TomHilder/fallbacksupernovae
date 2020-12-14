@@ -223,7 +223,7 @@ def animation(finalstep, y='density', path=''):
     camera = Camera(fig)
     for i in range(start, len(steps)):
         t = plt.plot(X[i], Y[i], color='green')
-        plt.xlabel(r'Radius [km]')
+        plt.xlabel(r'Radius [cm]')
         plt.ylabel(units[y])
         plt.xscale('log')
         if ylog == True:
