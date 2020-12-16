@@ -1,4 +1,4 @@
-# Functions for finding shocks in output of hydro code
+# Functions for finding shock in output of hydro code
 # Created by Tom Hilder for PHS3350 fallback supernovae project
 
 def read_output(finalstep, path=''):
@@ -85,7 +85,7 @@ def downstream_density(finalstep, path=''):
     downstream_densities = []
     for i in range(len(time)):
         j = shock_indices[i]
-        downstream_density_ = density[i,j-1]
+        downstream_density_ = density[i,j+1]
         downstream_densities.append(downstream_density_)
 
     return downstream_densities
@@ -104,7 +104,7 @@ def downstream_soundspeed(finalstep, path=''):
     downstream_cs = []
     for i in range(len(time)):
         j = shock_indices[i]
-        downstream_cs_i = c_s[i,j-1]
+        downstream_cs_i = c_s[i,j+1]
         downstream_cs.append(downstream_cs_i)
 
     return downstream_cs
@@ -135,7 +135,8 @@ def shock_animation(finalstep, path=''):
     camera = Camera(fig)
     for i in range(len(steps)-1):
         t = plt.plot(radius[i], velocity[i], color='green')
-        t = plt.vlines(shock_positions[i], 0, -1*v_jumps[i], color='r')
+        t = plt.vlines(shock_positions[i], -1E9, 1E9, color='r')
+        #t = plt.vlines(shock_positions[i], 0, -1*v_jumps[i], color='r')
         plt.xlabel(r'Radius [cm]')
         plt.ylabel(r'Velcity [cm/s]')
         plt.xscale('log')
