@@ -22,7 +22,7 @@ c     ============================================================
 
       integer, intent(in) :: istep
       integer :: i, j, k
-      real :: eps_tmp, e_ges, e_grav
+      real :: eps_tmp, e_ges, e_grav, e_pos, e_kinetic
       real, dimension(0:NX) :: m_enclosed
       character(len=8) :: num
 
@@ -32,6 +32,35 @@ c     ============================================================
       e_ges=(sum(u(1:NX,1:NY,1:NZ,4)*dv(1:NX,1:NY,1:NZ)))*sym_fac
       e_grav=0.5d0*sum(u(1:NX,1:NY,1:NZ,0)*dv(1:NX,1:NY,1:NZ)*
      +     phi_grav(1:NX,1:NY,1:NZ))*sym_fac
+
+      e_pos = 0.0d0
+
+      do k=1,NZ
+        do j=1,NY
+          do i=1,NX
+            IF (u(i,j,k,4)+u(i,j,k,0)*phi_grav(i,j,k)
+     &         .GT. 0.0) THEN
+                e_pos = e_pos +
+     &             (u(i,j,k,4)+u(i,j,k,0)*phi_grav(i,j,k)) *
+     &             dv (i,j,k) * sym_fac
+            END IF
+          end do
+        end do
+      end do
+
+      e_kinetic = 0.0d0
+
+      do k=1,NZ ! sum kinetic energy of all cells with positive velocity
+        do j=1,NY
+          do i=1,NX
+            IF (u(i,NY/2+1,1,1)/u(i,NY/2+1,1,0)
+     &        .GT. 0.0) THEN
+            e_kinetic = e_kinetic +
+     &        (dv(i,j,k)*u(i,NY/2+1,1,1)**2)/(2.*u(i,NY/2+1,1,0))
+            ENDIF
+          enddo
+        enddo
+      enddo
 
       m_enclosed(0) = m_core ! mass coordinate calcs:
       do i=1,NX
@@ -61,14 +90,14 @@ c     ============================================================
 
       ! output columns: radius, density, velocity (momentum density/density),
       !   ???, energy (energy density/density), grav potential, grav acc, time,
-      !   pressure, sound speed, mass coordinate, E_tot
+      !   pressure, sound speed, mass coordinate, E_tot, e_pos, kinetic energy
 
-         write(1,'(12(E16.7))') r(i),u(i,NY/2+1,1,0),
+         write(1,'(14(E16.7))') r(i),u(i,NY/2+1,1,0),
      +        u(i,NY/2+1,1,1)/u(i,NY/2+1,1,0),
      +        u(i,NY/2+1,1,3)/u(i,NY/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
      +        p(i,NY/2+1,1),c_s(i,NY/2+1,1),m_enclosed(i),
-     +        0*e_ges+e_grav+0*verlust_etot*sym_fac
+     +        0*e_ges+e_grav+0*verlust_etot*sym_fac,e_pos,e_kinetic
       end do
 c      do i=1,NY
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),

@@ -16,7 +16,9 @@ def units_dict():
     'pressure':r'Pressure [Ba]',
     'c_s':r'Sound Speed [$cm \, s^{-1}$]',
     'mass_coord':r'Mass Coordinate [g]',
-    'energy_tot':r'Total Energy [erg]'
+    'energy_tot':r'Total Energy [erg]',
+    'e_pos':r'e_pos [erg]',
+    'e_kinetic':r'Kinetic Energy [erg]'
     }
     return units
 
@@ -39,7 +41,7 @@ def plot(x='radius', y='density', step=0, path='', ev=False):
 
     u = np.loadtxt(file) # load output file as a numpy array
 
-    radius = u[:,0]          # [cm]
+    radius = u[:,0]         # [cm]
     density = u[:,1]        # [g/cm^3]
     velocity = u[:,2]       # [cm/s]
     energy = u[:,4]         # [erg]
@@ -50,6 +52,9 @@ def plot(x='radius', y='density', step=0, path='', ev=False):
     c_s = u[:,9]            # [cm/s]
     mass_coord = u[:,10]    # [g]
     energy_tot = u[:,11]    # [erg]
+    e_pos = u[:,12]         # [erg]
+    e_kinetic = u[:,13]     # [erg]
+
 
     X = eval(x)  # set x-axis plotting variable equal to that specified
     Y = eval(y)  # set y-axis plotting variable equal to that specified
@@ -73,6 +78,28 @@ def plot(x='radius', y='density', step=0, path='', ev=False):
         plt.savefig(path + x + '-' + y + str(step).zfill(8) + '.png', dpi=150)
         plt.show()
 
+def energy_time_plot(finalstep, path=''):
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import shock_analysis as sa
+
+    u = sa.read_output(finalstep, path='')
+
+    time = u[:,0,7]           # [s]
+    e_pos = u[:,0,12]         # [erg]
+    e_kinetic = u[:,0,13]
+
+    units = units_dict()
+
+    plt.plot(time, e_pos, label=units['e_pos'])
+    plt.plot(time, e_kinetic, label=units['e_kinetic'])
+    plt.legend(loc='best')
+    plt.yscale('log')
+    plt.xlabel(units['time']) # set axes labels using dictionary containing units for each parameter
+    plt.ylabel('Energy [erg]')
+    plt.savefig(path + 'time_energies.png', dpi=150)
+    plt.show()
 
 def evolution_2D_plot(finalstep, stepsize, x='radius', y='density', path=''):
     """
@@ -133,10 +160,12 @@ def evolution_3D_plot(finalstep, z='density', zlog=True, path=''):
     phi = u[:,:,5]              # [erg]
     g_acc = u[:,:,6]            # [cm/s^2]
     time = u[:,0,7]             # [s]
-    pressure = u[1:,:,8]         # [Ba]
-    c_s = u[1:,:,9]              # [cm/s]
+    pressure = u[1:,:,8]        # [Ba]
+    c_s = u[1:,:,9]             # [cm/s]
     mass_coord = u[:,:,10]      # [g]
     energy_tot = u[:,:,11]      # [erg]
+    e_pos = u[:,12]             # [erg]
+    e_kinetic = u[:,13]         # [erg]
 
     if z == 'pressure' or z == 'c_s': # first timestep has zero pressure and c_s, so we avoid it in this case
         time = u[1:,0,7]
@@ -199,7 +228,6 @@ def animation(finalstep, y='density', path=''):
     pressure = u[:,:,8]       # [Ba]
     c_s = u[:,:,9]            # [cm/s]
     mass_coord = u[:,:,10]    # [g]
-    energy_tot = u[:,:,11]    # [erg]
 
     X = radius
     Y = eval(y)  # set y-axis plotting variable equal to that specified

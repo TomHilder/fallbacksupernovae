@@ -71,43 +71,73 @@ def velocity_jumps(finalstep, path=''):
 
     return v_jumps
 
-def downstream_density(finalstep, path=''):
+def downstream_quantity(finalstep, quantity, path=''):
 
     import numpy as np
 
     u = read_output(finalstep, path)
 
-    time = u[:,0,7]             # [s]
+    time = u[:,0,7]         # [s]
+
+    radius = u[:,:,0]         # [cm]
     density = u[:,:,1]        # [g/cm^3]
+    velocity = u[:,:,2]       # [cm/s]
+    energy = u[:,:,4]         # [erg]
+    phi = u[:,:,5]            # [erg]
+    g_acc = u[:,:,6]          # [cm/s^2]
+    pressure = u[:,:,8]       # [Ba]
+    c_s = u[:,:,9]            # [cm/s]
+    mass_coord = u[:,:,10]    # [g]
+    energy_tot = u[:,:,11]    # [erg]
+    e_pos = u[:,0,12]         # [erg]
 
     shock_indices = extract_shocks(finalstep, path)[1]
 
-    downstream_densities = []
+    target = eval(quantity)
+
+    downstream_quantity = []
+
     for i in range(len(time)):
         j = shock_indices[i]
-        downstream_density_ = density[i,j+1]
-        downstream_densities.append(downstream_density_)
 
-    return downstream_densities
+        downstream_quantity_i = target[i,j-3]
+        downstream_quantity.append(downstream_quantity_i)
 
-def downstream_soundspeed(finalstep, path=''):
+    return downstream_quantity
+
+def upstream_quantity(finalstep, quantity, path=''):
 
     import numpy as np
 
     u = read_output(finalstep, path)
 
-    time = u[:,0,7]             # [s]
+    time = u[:,0,7]           # [s]
+
+    radius = u[:,:,0]         # [cm]
+    density = u[:,:,1]        # [g/cm^3]
+    velocity = u[:,:,2]       # [cm/s]
+    energy = u[:,:,4]         # [erg]
+    phi = u[:,:,5]            # [erg]
+    g_acc = u[:,:,6]          # [cm/s^2]
+    pressure = u[:,:,8]       # [Ba]
     c_s = u[:,:,9]            # [cm/s]
+    mass_coord = u[:,:,10]    # [g]
+    energy_tot = u[:,:,11]    # [erg]
+    e_pos = u[:,0,12]         # [erg]
 
     shock_indices = extract_shocks(finalstep, path)[1]
 
-    downstream_cs = []
+    target = eval(quantity)
+
+    upstream_quantity = []
+
     for i in range(len(time)):
         j = shock_indices[i]
-        downstream_cs_i = c_s[i,j+1]
-        downstream_cs.append(downstream_cs_i)
 
-    return downstream_cs
+        upstream_quantity_i = target[i,j+2]
+        upstream_quantity.append(upstream_quantity_i)
+
+    return upstream_quantity
 
 def shock_animation(finalstep, path=''):
 
@@ -145,3 +175,91 @@ def shock_animation(finalstep, path=''):
 
     animation = camera.animate()
     animation.save(path + 'shocks_animation.mp4')
+
+def cross_sec_area(radius):
+
+    import numpy as np
+
+    return 4*np.pi*radius**2
+
+def shock_eqn(gamma, A, rho0, c0, dv):
+
+     import numpy as np
+
+     return ((gamma + 1) * A * rho0 * dv**3) / (12 * c0)
+
+def eval_shock_eqn_RHS(finalstep, path=''):
+
+     import numpy as np
+
+     gamma = 5/3
+
+     shock_radius = np.array(extract_shocks(finalstep, path)[0])
+     A = cross_sec_area(shock_radius)
+
+     rho0 = np.array(upstream_quantity(finalstep, 'density', path))
+
+     c0 = np.array(upstream_quantity(finalstep, 'c_s', path))
+
+     dv = np.array(velocity_jumps(finalstep, path))
+
+     return shock_eqn(gamma, A, rho0, c0, dv)
+
+def eval_shock_eqn_LHS(finalstep, path=''):
+
+    import numpy as np
+
+    u = read_output(finalstep, path)
+    e_pos = u[:,0,12]
+    e_kinetic = u[:,0,13]
+
+    #wave_energy = e_pos
+    wave_energy = e_kinetic
+    shock_radius = np.array(extract_shocks(finalstep, path)[0])
+
+    return -1*(np.gradient(e_pos, shock_radius))
+
+def shock_eqn_plot(finalstep, path=''):
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    u = read_output(finalstep, path)
+    time = u[:,0,7]
+
+    LHS = -1*eval_shock_eqn_LHS(finalstep, path)
+    RHS = -1*eval_shock_eqn_RHS(finalstep, path)
+
+    time2 = time[LHS > 0]
+    LHS2 = LHS[LHS > 0]
+
+    plt.close('all')
+    plt.plot(time2, LHS2, color='red', label=r'$\frac{dE_w}{dr}$')
+    plt.plot(time, RHS, color='blue', label=r'$\frac{-(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
+    plt.legend(loc='best', prop={'size': 15})
+    plt.yscale('log')
+    plt.xlabel('Time [s]')
+    #plt.ylim(1, 0.5E40)
+    plt.savefig(path + 'shock_eqn' + '.png', dpi=200)
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########
