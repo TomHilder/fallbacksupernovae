@@ -67,7 +67,8 @@ c     ============================================================
             IF (u(i,1/2+1,1,1)/u(i,1/2+1,1,0)
      &        .GT. 0.0) THEN
             e_kinetic = e_kinetic +
-     &        (dv(i,j,k)*u(i,1/2+1,1,1)**2)/(2.*u(i,1/2+1,1,0))
+     &        (sym_fac*dv(i,j,k)*u(i,1/2+1,1,1)**2)/
+     &        (2.*u(i,1/2+1,1,0))
             ENDIF
           enddo
         enddo
@@ -102,7 +103,7 @@ c     ============================================================
      +        u(i,1/2+1,1,3)/u(i,1/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
      +        p(i,1/2+1,1),c_s(i,1/2+1,1),m_enclosed(i),
-     +        0*e_ges+e_grav+0*verlust_etot*sym_fac, e_pos, e_kinetic
+     +        0*e_ges+e_grav+0*verlust_etot*sym_fac,e_pos,e_kinetic
       end do
 c      do i=1,1
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),

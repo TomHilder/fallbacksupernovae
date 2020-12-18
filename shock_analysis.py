@@ -197,9 +197,11 @@ def eval_shock_eqn_RHS(finalstep, path=''):
      shock_radius = np.array(extract_shocks(finalstep, path)[0])
      A = cross_sec_area(shock_radius)
 
-     rho0 = np.array(upstream_quantity(finalstep, 'density', path))
+     rho0 = np.array(downstream_quantity(finalstep, 'density', path))
+     c0 = np.array(downstream_quantity(finalstep, 'c_s', path))
 
-     c0 = np.array(upstream_quantity(finalstep, 'c_s', path))
+     #rho0 = np.array(upstream_quantity(finalstep, 'density', path))
+     #c0 = np.array(upstream_quantity(finalstep, 'c_s', path))
 
      dv = np.array(velocity_jumps(finalstep, path))
 
@@ -213,11 +215,12 @@ def eval_shock_eqn_LHS(finalstep, path=''):
     e_pos = u[:,0,12]
     e_kinetic = u[:,0,13]
 
-    #wave_energy = e_pos
-    wave_energy = e_kinetic
+    wave_energy = e_pos
+    #wave_energy = e_kinetic
     shock_radius = np.array(extract_shocks(finalstep, path)[0])
 
-    return -1*(np.gradient(e_pos, shock_radius))
+    return -1*(np.gradient(wave_energy, shock_radius))
+    #return wave_energy, shock_radius
 
 def shock_eqn_plot(finalstep, path=''):
 
@@ -227,22 +230,32 @@ def shock_eqn_plot(finalstep, path=''):
     u = read_output(finalstep, path)
     time = u[:,0,7]
 
-    LHS = -1*eval_shock_eqn_LHS(finalstep, path)
-    RHS = -1*eval_shock_eqn_RHS(finalstep, path)
+    LHS = eval_shock_eqn_LHS(finalstep, path)
+    RHS = eval_shock_eqn_RHS(finalstep, path)
 
-    time2 = time[LHS > 0]
-    LHS2 = LHS[LHS > 0]
+    time2 = time[LHS < 0]
+    LHS2 = LHS[LHS < 0]
+    RHS2 = RHS[LHS < 0]
+
+    dif = (RHS - LHS)/RHS *100
+    dif2 = (RHS2 - LHS2)/RHS2 *100
 
     plt.close('all')
-    plt.plot(time2, LHS2, color='red', label=r'$\frac{dE_w}{dr}$')
-    plt.plot(time, RHS, color='blue', label=r'$\frac{-(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
-    plt.legend(loc='best', prop={'size': 15})
-    plt.yscale('log')
-    plt.xlabel('Time [s]')
-    #plt.ylim(1, 0.5E40)
+
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [3, 1]})
+
+    #ax1.plot(time, LHS, color='red', label=r'$- \frac{dE_w}{dr}$')
+    ax1.plot(time2, LHS2, color='red', label=r'$\frac{dE_w}{dr}$')
+    ax1.plot(time, RHS, color='blue', label=r'$\frac{(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
+    ax1.legend(loc='best', fontsize='15')
+    ax1.set_yscale('symlog')
+    #ax2.plot(time, dif, color='orange')
+    ax2.plot(time2, dif2, color='orange')
+    ax2.set_ylabel('% Difference', fontsize='10')
+    ax2.set_xlabel('Time [s]', fontsize='10')
+
     plt.savefig(path + 'shock_eqn' + '.png', dpi=200)
     plt.show()
-
 
 
 
