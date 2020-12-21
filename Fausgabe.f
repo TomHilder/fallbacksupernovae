@@ -95,15 +95,17 @@ c     ============================================================
      +        c_s(i,1/2,1),0)
 
       ! output columns: radius, density, velocity (momentum density/density),
-      !   ???, energy (energy density/density), grav potential, grav acc, time,
-      !   pressure, sound speed, mass coordinate, E_tot, e_pos, kinetic energy
+      !   ???, energy density, grav potential, grav acc, time,
+      !   pressure, sound speed, mass coordinate, E_tot, e_pos, kinetic energy,
+      !   cell volume
 
-         write(1,'(14(E16.7))') r(i),u(i,1/2+1,1,0),
+         write(1,'(15(E16.7))') r(i),u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,1)/u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,3)/u(i,1/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
      +        p(i,1/2+1,1),c_s(i,1/2+1,1),m_enclosed(i),
-     +        0*e_ges+e_grav+0*verlust_etot*sym_fac,e_pos,e_kinetic
+     +        0*e_ges+e_grav+0*verlust_etot*sym_fac,e_pos,e_kinetic,
+     +        dv(i,1/2+1,1)
       end do
 c      do i=1,1
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),

@@ -20,7 +20,7 @@ def units_dict():
     'e_pos':r'e_pos [erg]',
     'e_kinetic':r'Kinetic Energy [erg]'
     }
-    
+
     return units
 
 def plot(x='radius', y='density', step=0, path='', ev=False):
@@ -85,16 +85,21 @@ def energy_time_plot(finalstep, path=''):
     import matplotlib.pyplot as plt
     import shock_analysis as sa
 
-    u = sa.read_output(finalstep, path='')
+    from shock_analysis import read_output
+    from shock_analysis import total_binding_ahead_shock
+
+    u = read_output(finalstep, path)
 
     time = u[:,0,7]           # [s]
     e_pos = u[:,0,12]         # [erg]
     e_kinetic = u[:,0,13]
+    e_binding_ahead = np.abs(total_binding_ahead_shock(finalstep, path))
 
     units = units_dict()
 
     plt.plot(time, e_pos, label=units['e_pos'])
     plt.plot(time, e_kinetic, label=units['e_kinetic'])
+    plt.plot(time, e_binding_ahead, label='Binding energy ahead of shock (absolute value) [erg]')
     plt.legend(loc='best')
     plt.yscale('log')
     plt.xlabel(units['time']) # set axes labels using dictionary containing units for each parameter
