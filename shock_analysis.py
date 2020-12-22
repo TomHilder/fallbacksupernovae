@@ -272,14 +272,27 @@ def initial_final_explosion_energy(finalstep):
     u1_00 = read_output(finalstep, 'Mach 1.0/')
     u1_25 = read_output(finalstep, 'Mach 1.25/')
     u1_50 = read_output(finalstep, 'Mach 1.5/')
+    u1_75 = read_output(finalstep, 'Mach 1.75/')
+    u2_00 = read_output(finalstep, 'Mach 2.0/')
 
-    init_energies = [u0_50[:,0,12],u0_75[:,0,12],u1_00[:,0,12],u1_25[:,0,12],u1_50[:,0,12]]
-    final_energies = [u0_50[-1,0,12],u0_75[-1,0,12],u1_00[-1,0,12],u1_25[-1,0,12],u1_50[-1,0,12]]
 
-    init_mach = [0.5, 0.75, 1.0, 1.25, 1.5]
+    #energies = [u0_50[:,0,12],u0_75[:,0,12],u1_00[:,0,12],u1_25[:,0,12],u1_50[:,0,12]]
+    #energies = [u1_00[:,0,12],u1_25[:,0,12],u1_50[:,0,12],u1_75[:,0,12],u2_00[:,0,12]] # e_pos
+
+    energies = [u1_00[:,0,13],u1_25[:,0,13],u1_50[:,0,13],u1_75[:,0,13],u2_00[:,0,13]] # e_kinetic
+
+    init_energies = []
+    final_energies = []
+
+    for j in energies:
+        init_energies.append(np.amax(j[0:8]))
+        final_energies.append(j[-1])
+
+    #init_mach = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+    init_mach = [1.0, 1.25, 1.5, 1.75, 2.0]
 
     plt.close('all')
-    """
+
     plt.plot(init_mach, init_energies, c='blue', label='Initial Explosion Energy')
     plt.plot(init_mach, final_energies, c='red', label='Final Explosion Energy')
 
@@ -290,11 +303,10 @@ def initial_final_explosion_energy(finalstep):
 
     plt.legend(loc='best')
 
+    plt.savefig('init_final_energy_ekin.png')
     plt.show()
-    plt.savefig('init_final_energy.png')
-    """
 
-    return init_energies
+    return init_energies, final_energies
 
 def binding_ahead_shock(time_index, u, shock_indices):
 
