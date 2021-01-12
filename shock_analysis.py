@@ -222,7 +222,7 @@ def eval_shock_eqn_LHS(finalstep, path=''):
     return -1*(np.gradient(wave_energy, shock_radius))#*-1
     #return wave_energy, shock_radius
 
-def shock_eqn_plot(finalstep, path=''):
+def shock_eqn_plot(finalstep, regime_line=False, path=''):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -231,7 +231,7 @@ def shock_eqn_plot(finalstep, path=''):
     time = u[:,0,7]
 
     LHS = eval_shock_eqn_LHS(finalstep, path)
-    RHS = eval_shock_eqn_RHS(finalstep, path)
+    RHS = 0.5*eval_shock_eqn_RHS(finalstep, path)
 
     time2 = time[LHS > 0]
     LHS2 = LHS[LHS > 0]
@@ -240,6 +240,16 @@ def shock_eqn_plot(finalstep, path=''):
     dif = (RHS - LHS)/RHS *100
     dif2 = (RHS2 - LHS2)/RHS2 *100
 
+    if regime_line == True:
+
+        time = u[:,0,7]           # [s]
+        e_pos = u[:,0,12]         # [erg]
+        e_kinetic = u[:,0,13]
+        e_binding_ahead = np.abs(total_binding_ahead_shock(finalstep, path))
+
+        index = index_array2_larger(e_binding_ahead, e_kinetic)
+        regime_time = time[index]
+
     plt.close('all')
 
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={'height_ratios': [3, 1]})
@@ -247,8 +257,12 @@ def shock_eqn_plot(finalstep, path=''):
     #ax1.plot(time, LHS, color='red', label=r'$- \frac{dE_w}{dr}$')
     ax1.plot(time2, LHS2, color='red', label=r'$- \frac{dE_w}{dr}$')
 
-    ax1.plot(time, RHS, color='blue', label=r'$\frac{(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
-    ax1.legend(loc='best', fontsize='15')
+    ax1.plot(time, RHS, color='blue', label=r'$\frac{1}{2} \, \frac{(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
+
+    if regime_line == True:
+        ax1.vlines(regime_time,  1E37, 1E42, color='green', label=r'Time: kinetic_E > binding_E')
+
+    ax1.legend(loc='best', fontsize='10')
     ax1.set_yscale('symlog')
 
     #ax2.plot(time, dif, color='orange')
@@ -379,20 +393,54 @@ def shock_velocity_plot(finalstep, path=''):
 
     import numpy as np
     import matplotlib.pyplot as plt
+    from matplotlib.ticker import (AutoLocator, AutoMinorLocator)
+
+    u = read_output(finalstep, path)
+
+    time = u[:,0,7]
 
     shock_radii = np.array(extract_shocks(finalstep, path)[0])
     shock_velocities = shock_velocity(finalstep, path)
     escape_velocities = escape_velocity(32, shock_radii)
 
+    fig, ax = plt.subplots(constrained_layout=True)
+    ax.plot(shock_radii, shock_velocities, label='Shock Velocity')
+    ax.plot(shock_radii, escape_velocities, label='Escape Velocity')
+    ax.set_xlabel('Shock Radius [cm]')
+    ax.set_ylabel('Velocity [cm/s]')
+    ax.set_yscale('log')
+
+    def forward(x):
+        return np.interp(x, shock_radii, time)
+
+    def inverse(x):
+        return np.interp(x, time, shock_radii)
+
+    secax = ax.secondary_xaxis('top', functions=(forward, inverse))
+    secax.xaxis.set_minor_locator(AutoMinorLocator())
+    secax.set_xlabel('Time [s]')
+
+    """
     plt.plot(shock_radii, shock_velocities, label='Shock Velocity')
     plt.plot(shock_radii, escape_velocities, label='Escape Velocity')
     plt.legend(loc='best')
     plt.yscale('log')
-    plt.xlabel('Shock Radius [cm]') # set axes labels using dictionary containing units for each parameter
+    plt.xlabel('Shock Radius [cm]')
     plt.ylabel('Velocity [cm/s]')
+    """
 
     plt.savefig(path + 'shock_vel_rad_esc.png', dpi=150)
     plt.show()
+
+
+def index_array2_larger(array1, array2):
+    for i in range(len(array1)):
+
+        a = array1[i]
+        b = array2[i]
+
+        if b > a:
+            return i
 
 
 
