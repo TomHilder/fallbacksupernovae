@@ -194,7 +194,7 @@ c     ============================================================
 
 
       real, parameter :: r_dump = 2.0d0 * R_MIN
-      real, parameter :: ma_sh = 1.75
+      real, parameter :: ma_sh = 2.0
 
       real,allocatable :: r_tmp(:),m_tmp(:),rho_tmp(:),p_tmp(:)
       real :: xi,xi1

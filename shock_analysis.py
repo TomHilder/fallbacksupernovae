@@ -214,12 +214,14 @@ def eval_shock_eqn_LHS(finalstep, path=''):
     u = read_output(finalstep, path)
     e_pos = u[:,0,12]
     e_kinetic = u[:,0,13]
+    wave_lum = wave_luminosity(finalstep, path)
 
-    #wave_energy = e_pos
-    wave_energy = e_kinetic
+    wave_energy = e_pos # remove -1 factor from return line if you use this
+    #wave_energy = e_kinetic
+    #wave_energy = wave_lum
     shock_radius = np.array(extract_shocks(finalstep, path)[0])
 
-    return -1*(np.gradient(wave_energy, shock_radius))#*-1
+    return (np.gradient(wave_energy, shock_radius))
     #return wave_energy, shock_radius
 
 def shock_eqn_plot(finalstep, regime_line=False, path=''):
@@ -242,8 +244,7 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
 
     if regime_line == True:
 
-        time = u[:,0,7]           # [s]
-        e_pos = u[:,0,12]         # [erg]
+        time = u[:,0,7]
         e_kinetic = u[:,0,13]
         e_binding_ahead = np.abs(total_binding_ahead_shock(finalstep, path))
 
@@ -271,7 +272,7 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     ax2.set_ylabel('% Difference', fontsize='10')
     ax2.set_xlabel('Time [s]', fontsize='10')
 
-    plt.savefig(path + 'shock_eqn' + '.png', dpi=200)
+    plt.savefig(path + 'shock_eqn_epos' + '.png', dpi=200)
     plt.show()
 
 def initial_final_explosion_energy(finalstep):
@@ -442,11 +443,51 @@ def index_array2_larger(array1, array2):
         if b > a:
             return i
 
+def wave_luminosity(finalstep, path=''):
 
+    import numpy as np
 
+    shock_v = shock_velocity(finalstep, path)
+    c0 = np.array(upstream_quantity(finalstep, 'c_s', path))
+    rho0 = np.array(upstream_quantity(finalstep, 'density', path))
 
+    shock_radius = np.array(extract_shocks(finalstep, path)[0])
+    A = cross_sec_area(shock_radius)
 
+    return A*rho0*c0*shock_v**2
 
+def all_shock_eqn_plots():
+    shock_eqn_plot(80000, False, 'Mach 0.5/')
+    shock_eqn_plot(94000, True, 'Mach 0.75/')
+    shock_eqn_plot(85000, True, 'Mach 1.0/')
+    shock_eqn_plot(85000, True, 'Mach 1.25/')
+    shock_eqn_plot(83000, True, 'Mach 1.5/')
+    shock_eqn_plot(91000, True, 'Mach 1.75/')
+    shock_eqn_plot(182000, True, 'Mach 2.0/')
+
+def phi_grav_out_array(finalstep, path=''):
+    # INCOMPLETE
+
+    import numpy as np
+
+    u = read_output(finalstep, path)
+
+    G = 6.674E-8 # Gravitational constant in cgs
+
+    radius = u[:,:,0]          # [cm]
+    density = u[:,:,1]        # [g/cm^3]
+    velocity = u[:,:,2]       # [cm/s]
+    time = u[:,0,7]           # [s]
+
+    shock_radius_indicies = np.array(extract_shocks(finalstep, path)[1])
+
+    #for one time step
+
+    radii_step = radius[0,:]
+    density_step = density[0,:]
+    shock_index = shock_radius_indicies[0]
+
+    #for i in range(len(radii_step[shock_index:])):
 
 
 
