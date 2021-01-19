@@ -33,7 +33,7 @@ c     ============================================================
 
       integer, intent(in) :: istep
       integer :: i, j, k
-      real :: eps_tmp, e_ges, e_grav, e_pos, e_kinetic
+      real :: eps_tmp, e_ges, e_grav, e_pos, e_kinetic, e_expl, new_expl
       real, dimension(0:800) :: m_enclosed
       character(len=8) :: num
 
@@ -64,16 +64,18 @@ c     ============================================================
       do k=1,1 ! sum kinetic energy of all cells with positive velocity
         do j=1,1
           do i=1,800
-            IF (u(i,1/2+1,1,1)/u(i,1/2+1,1,0)
+            IF (u(i,j,k,1)/u(i,j,k,0)
      &        .GT. 0.0) THEN
             e_kinetic = e_kinetic +
-     &        (sym_fac*dv(i,j,k)*u(i,1/2+1,1,1)**2)/
-     &        (2.*u(i,1/2+1,1,0))
+     &        (sym_fac*dv(i,j,k)*u(i,j,k,1)**2)/
+     &        (2.*u(i,j,k,0))
             ENDIF
           enddo
         enddo
       enddo
 
+      e_expl = 0.0d0
+      
       m_enclosed(0) = m_core ! mass coordinate calcs:
       do i=1,800
         m_enclosed(i) = m_enclosed(i-1)
@@ -94,18 +96,29 @@ c     ============================================================
           call eos(u(i,1/2+1,1,0),eps(i,1/2+1,1),p(i,1/2,1),
      +        c_s(i,1/2,1),0)
 
+        do j=1,1
+          do k=1,1
+            new_expl = u(i,j,k,0)*(eps(i,j,k)
+     &         + 0.5*(u(i,j,k,1)/u(i,j,k,0)))
+     &         + u(i,j,k,0)*phi_grav(i,j,k)+p(i,j,k)
+            IF (new_expl .GT. 0.0) THEN
+                e_expl = e_expl + new_expl*dv(i,j,k)*sym_fac
+            END IF
+          end do
+        end do
+
       ! output columns: radius, density, velocity (momentum density/density),
       !   ???, energy density, grav potential, grav acc, time,
       !   pressure, sound speed, mass coordinate, E_tot, e_pos, kinetic energy,
-      !   cell volume, internal energy
+      !   cell volume, internal energy, e_expl
 
-         write(1,'(16(E16.7))') r(i),u(i,1/2+1,1,0),
+         write(1,'(17(E16.7))') r(i),u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,1)/u(i,1/2+1,1,0),
      +        u(i,1/2+1,1,3)/u(i,1/2+1,1,0),
      +        u(i,1,1,4),phi_grav(i,1,1),a_grv(i,1,1,1),zeit,
      +        p(i,1/2+1,1),c_s(i,1/2+1,1),m_enclosed(i),
      +        0*e_ges+e_grav+0*verlust_etot*sym_fac,e_pos,e_kinetic,
-     +        dv(i,1/2+1,1),eps(i,1/2+1,1)
+     +        dv(i,1/2+1,1),eps(i,1/2+1,1),e_expl
       end do
 c      do i=1,1
 c         write(1,'(7(D16.7))') theta(i),u(4,i,1,2),u(5,i,1,0),

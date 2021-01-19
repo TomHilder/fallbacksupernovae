@@ -90,6 +90,7 @@ def downstream_quantity(finalstep, quantity, path=''):
     mass_coord = u[:,:,10]    # [g]
     energy_tot = u[:,:,11]    # [erg]
     e_pos = u[:,0,12]         # [erg]
+    eps = u[:,:,15]          # [erg]
 
     shock_indices = extract_shocks(finalstep, path)[1]
 
@@ -124,6 +125,7 @@ def upstream_quantity(finalstep, quantity, path=''):
     mass_coord = u[:,:,10]    # [g]
     energy_tot = u[:,:,11]    # [erg]
     e_pos = u[:,0,12]         # [erg]
+    eps = u[:,:,15]          # [erg]
 
     shock_indices = extract_shocks(finalstep, path)[1]
 
@@ -212,16 +214,17 @@ def eval_shock_eqn_LHS(finalstep, path=''):
     import numpy as np
 
     u = read_output(finalstep, path)
-    e_pos = u[:,0,12]
-    e_kinetic = u[:,0,13]
-    wave_lum = wave_luminosity(finalstep, path)
 
-    wave_energy = e_pos # remove -1 factor from return line if you use this
-    #wave_energy = e_kinetic
-    #wave_energy = wave_lum
+    #wave_energy = u[:,0,12] # e_pos -> remove -1 factor from return line if you use this
+    #wave_energy = u[:,0,13] # e_kinetic
+    #wave_energy = wave_luminosity(finalstep, path)
+    #wave_energy = acc_luminosity(finalstep, path)
+    #wave_energy = acc_luminosity_enthalpy(finalstep, path)
+    wave_energy = u[:,-1,16] # e_expl
+
     shock_radius = np.array(extract_shocks(finalstep, path)[0])
 
-    return (np.gradient(wave_energy, shock_radius))
+    return -1*(np.gradient(wave_energy, shock_radius))
     #return wave_energy, shock_radius
 
 def shock_eqn_plot(finalstep, regime_line=False, path=''):
@@ -238,6 +241,9 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     time2 = time[LHS > 0]
     LHS2 = LHS[LHS > 0]
     RHS2 = RHS[LHS > 0]
+
+    print(LHS2)
+    print(RHS2)
 
     dif = (RHS - LHS)/RHS *100
     dif2 = (RHS2 - LHS2)/RHS2 *100
@@ -272,7 +278,7 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     ax2.set_ylabel('% Difference', fontsize='10')
     ax2.set_xlabel('Time [s]', fontsize='10')
 
-    plt.savefig(path + 'shock_eqn_epos' + '.png', dpi=200)
+    plt.savefig(path + 'shock_eqn_expl' + '.png', dpi=200)
     plt.show()
 
 def initial_final_explosion_energy(finalstep):
@@ -456,14 +462,46 @@ def wave_luminosity(finalstep, path=''):
 
     return A*rho0*c0*shock_v**2
 
+def acc_luminosity(finalstep, path=''):
+
+    import numpy as np
+
+    shock_radius = np.array(extract_shocks(finalstep, path)[0])
+    A = cross_sec_area(shock_radius)
+    #rho0 = np.array(upstream_quantity(finalstep, 'density', path))
+    #c0 = np.array(upstream_quantity(finalstep, 'c_s', path))
+    rho0 = np.array(downstream_quantity(finalstep, 'density', path))
+    c0 = np.array(downstream_quantity(finalstep, 'c_s', path))
+
+    dv = velocity_jumps(finalstep, path)
+
+    return A*rho0*c0*dv**2
+
+def acc_luminosity_enthalpy(finalstep, path=''):
+
+    import numpy as np
+
+    shock_radius = np.array(extract_shocks(finalstep, path)[0])
+    A = cross_sec_area(shock_radius)
+    #rho0 = np.array(upstream_quantity(finalstep, 'density', path))
+    rho0 = np.array(downstream_quantity(finalstep, 'density', path))
+
+    dv = velocity_jumps(finalstep, path)
+    deps = np.abs(np.array(upstream_quantity(finalstep, 'eps', path))
+        - np.array(downstream_quantity(finalstep, 'eps', path)))
+    dP = np.abs(np.array(upstream_quantity(finalstep, 'pressure', path))
+        - np.array(downstream_quantity(finalstep, 'pressure', path)))
+
+    return A * (rho0 * (dv**2/2 + deps) + dP)
+
 def all_shock_eqn_plots():
-    shock_eqn_plot(80000, False, 'Mach 0.5/')
-    shock_eqn_plot(94000, True, 'Mach 0.75/')
-    shock_eqn_plot(85000, True, 'Mach 1.0/')
-    shock_eqn_plot(85000, True, 'Mach 1.25/')
-    shock_eqn_plot(83000, True, 'Mach 1.5/')
-    shock_eqn_plot(91000, True, 'Mach 1.75/')
-    shock_eqn_plot(182000, True, 'Mach 2.0/')
+    shock_eqn_plot(100000, False, 'Mach 0.5/')
+    shock_eqn_plot(100000, True, 'Mach 0.75/')
+    shock_eqn_plot(100000, True, 'Mach 1.0/')
+    shock_eqn_plot(100000, True, 'Mach 1.25/')
+    shock_eqn_plot(100000, True, 'Mach 1.5/')
+    shock_eqn_plot(100000, True, 'Mach 1.75/')
+    shock_eqn_plot(100000, True, 'Mach 2.0/')
 
 def phi_grav_out_array(finalstep, path=''):
     # INCOMPLETE
