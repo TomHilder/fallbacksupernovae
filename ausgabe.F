@@ -64,7 +64,7 @@ c     ============================================================
       enddo
 
       e_expl = 0.0d0
-      
+
       m_enclosed(0) = m_core ! mass coordinate calcs:
       do i=1,NX
         m_enclosed(i) = m_enclosed(i-1)
@@ -93,8 +93,7 @@ c     ============================================================
 
         do j=1,NY
           do k=1,NZ
-            new_expl = u(i,j,k,0)*(eps(i,j,k)
-     &         + 0.5*(u(i,j,k,1)/u(i,j,k,0)))
+            new_expl = u(i,j,k,4)
      &         + u(i,j,k,0)*phi_grav(i,j,k)+p(i,j,k)
             IF (new_expl .GT. 0.0) THEN
                 e_expl = e_expl + new_expl*dv(i,j,k)*sym_fac

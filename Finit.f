@@ -145,11 +145,18 @@ c     ============================================================
 
 
       real, parameter :: r_dump = 2.0d0 * 1.5d8
-      real, parameter :: ma_sh = 2.0
+      real, parameter :: ma_sh = 0.75
+      real, parameter :: infall_v_frac = 0.1
+
+      ! set to 0 for not initially collapsing, set to 1 for initially collapsing
+      real, parameter :: infall = 1
+
+      ! set to 0 to use infall v as fraction of esc_v, and 1 for fraction of sound speed
+      real, parameter :: use_sound = 1
 
       real,allocatable :: r_tmp(:),m_tmp(:),rho_tmp(:),p_tmp(:)
-      real :: xi,xi1
-      integer :: nx_tmp
+      real :: xi,xi1,esc_v,sound_v,use_v
+      integer :: nx_tmp,dump_i
 
       integer :: i,j,k
 
@@ -192,12 +199,48 @@ c            print *,i,j,r(i),r_tmp(j:j+1),m_tmp(j),rho_tmp(j),p_tmp(j)
          end do
       end do
 
+c     find index where radius => r_dump
+      do i=1,800
+        if (r(i) .ge. r_dump) then
+          dump_i = i
+          print*,'dump_i = ',i
+          EXIT
+        end if
+      end do
+
+c     set in-falling material velocity profile:
+      if (infall .eq. 1) then
+        esc_v = sqrt(6.674E-8 * 1.988E33 * 32 / r_dump)
+        sound_v = sqrt(gamma_e*
+     &       (gamma_e-1.0)*u(dump_i,1,1,4)/u(dump_i,1,1,0))
+        print*,'esc_v = ', esc_v
+        print*,'sound_v = ', sound_v
+        print*,'sound_v/esc_v= ', sound_v/esc_v
+        use_v = esc_v
+        if (use_sound .eq. 1) then
+          use_v = sound_v
+        end if
+        !print*,'use_v = ',use_v
+        do k=1,1
+          do j=1,1
+            do i=1,800
+              u(i,j,k,1)=-1 * u(i,j,k,0) * infall_v_frac * use_v *
+     &             (r(i) / r_dump)**(-2.)
+              if (r(i) .gt. r_dump) then
+                u(i,j,k,4)=u(i,j,k,4) + 0.5 * u(i,j,k,1)**2 / u(i,j,k,0)
+              end if
+            end do
+          end do
+        end do
+      end if
+
 c     dump extra energy to explode model:
       do k=1,1
          do j=1,1
             do i=1,800
                if (r(i) .le. r_dump) then
-                  u(i,j,k,1)=u(i,j,k,0) * ma_sh * (r(i)/r_dump) *
+                  u(i,j,k,1)=u(i,j,k,1) +
+     &                 u(i,j,k,0) * ma_sh * (r(i)/r_dump) *
      &                 sqrt(gamma_e*(gamma_e-1.0)*u(i,j,k,4)/u(i,j,k,0))
                   u(i,j,k,4)=u(i,j,k,4) * (1.0+ma_sh) +
      &                 0.5d0 * u(i,j,k,1)**2 / u(i,j,k,0)
@@ -205,6 +248,31 @@ c     dump extra energy to explode model:
             end do
          end do
       end do
+
+c     set in-falling material velocity profile
+!      if (infall .eq. 1) then
+!        esc_v = sqrt(6.674E-8 * 1.988E33 * 32 / r_dump)
+!        sound_v = sqrt(5./3. * p_tmp(dump_i) / u(dump_i,1,1,0))
+!        print*,'esc_v = ', esc_v
+!        print*,'sound_v = ', sound_v
+!        print*,'esc_v/sound_v= ', esc_v/sound_v
+!        use_v = esc_v
+!        if (use_sound .eq. 1) then
+!          use_v = sound_v
+!        end if
+!        !print*,'use_v = ',use_v
+!        do k=1,1
+!          do j=1,1
+!            do i=1,800
+!              if (r(i) .gt. r_dump) then
+!              u(i,j,k,1)=-1 * u(i,j,k,0) * infall_v_frac * use_v *
+!     &             (r(i) / r_dump)**(-2.)
+!              u(i,j,k,4)=u(i,j,k,4) + 0.5 * u(i,j,k,1)**2 / u(i,j,k,0)
+!              end if
+!            end do
+!          end do
+!        end do
+!      end if
 
       print*,'Core mass (M_sun):', m_core / msun
 c      stop

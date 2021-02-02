@@ -23,7 +23,8 @@ def locate_shock(velocities):
 
     shock_ind = 0
     for i in range(len(mag_dv)-1):
-        if mag_dv[i+1] >= 2E7:
+        #if mag_dv[i+1] >= 2E7:
+        if mag_dv[i+1] >= 1.5E7:
             shock_ind = i
 
     return shock_ind
@@ -188,7 +189,10 @@ def shock_eqn(gamma, A, rho0, c0, dv):
 
      import numpy as np
 
-     return ((gamma + 1) * A * rho0 * dv**3) / (12 * c0)
+     rad = np.array(extract_shocks(100000, 'Mach 0.5/')[0])
+
+     return ((gamma + 1) * A * rho0 * dv**3) / (12 * c0)    # if Ew is energy
+     #return -1*np.gradient((((gamma + 1) * A * rho0 * dv**3) / (12)),rad)           # if Ew is luminosity
 
 def eval_shock_eqn_RHS(finalstep, path=''):
 
@@ -216,14 +220,15 @@ def eval_shock_eqn_LHS(finalstep, path=''):
     u = read_output(finalstep, path)
 
     #wave_energy = u[:,0,12] # e_pos -> remove -1 factor from return line if you use this
-    #wave_energy = u[:,0,13] # e_kinetic
+    wave_energy = u[:,0,13] # e_kinetic
     #wave_energy = wave_luminosity(finalstep, path)
     #wave_energy = acc_luminosity(finalstep, path)
     #wave_energy = acc_luminosity_enthalpy(finalstep, path)
-    wave_energy = u[:,-1,16] # e_expl
-
+    #wave_energy = u[:,-1,16] # e_expl
+    #print(wave_energy)
     shock_radius = np.array(extract_shocks(finalstep, path)[0])
-
+    #print(shock_radius)
+    #print(-1*(np.gradient(wave_energy, shock_radius)))
     return -1*(np.gradient(wave_energy, shock_radius))
     #return wave_energy, shock_radius
 
@@ -242,9 +247,6 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     LHS2 = LHS[LHS > 0]
     RHS2 = RHS[LHS > 0]
 
-    print(LHS2)
-    print(RHS2)
-
     dif = (RHS - LHS)/RHS *100
     dif2 = (RHS2 - LHS2)/RHS2 *100
 
@@ -253,6 +255,9 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
         time = u[:,0,7]
         e_kinetic = u[:,0,13]
         e_binding_ahead = np.abs(total_binding_ahead_shock(finalstep, path))
+
+        print(e_kinetic)
+        print(e_binding_ahead)
 
         index = index_array2_larger(e_binding_ahead, e_kinetic)
         regime_time = time[index]
@@ -264,7 +269,7 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     #ax1.plot(time, LHS, color='red', label=r'$- \frac{dE_w}{dr}$')
     ax1.plot(time2, LHS2, color='red', label=r'$- \frac{dE_w}{dr}$')
 
-    ax1.plot(time, RHS, color='blue', label=r'$\frac{1}{2} \, \frac{(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
+    ax1.plot(time2, RHS2, color='blue', label=r'$\frac{1}{2} \, \frac{(\gamma + 1) A \rho_0 (\Delta v)^3}{12 c_0}$')
 
     if regime_line == True:
         ax1.vlines(regime_time,  1E37, 1E42, color='green', label=r'Time: kinetic_E > binding_E')
@@ -278,7 +283,7 @@ def shock_eqn_plot(finalstep, regime_line=False, path=''):
     ax2.set_ylabel('% Difference', fontsize='10')
     ax2.set_xlabel('Time [s]', fontsize='10')
 
-    plt.savefig(path + 'shock_eqn_expl' + '.png', dpi=200)
+    plt.savefig(path + 'shock_eqn_kin' + '.png', dpi=200)
     plt.show()
 
 def initial_final_explosion_energy(finalstep):
@@ -413,6 +418,7 @@ def shock_velocity_plot(finalstep, path=''):
     fig, ax = plt.subplots(constrained_layout=True)
     ax.plot(shock_radii, shock_velocities, label='Shock Velocity')
     ax.plot(shock_radii, escape_velocities, label='Escape Velocity')
+    ax.legend(loc='best')
     ax.set_xlabel('Shock Radius [cm]')
     ax.set_ylabel('Velocity [cm/s]')
     ax.set_yscale('log')
@@ -441,12 +447,9 @@ def shock_velocity_plot(finalstep, path=''):
 
 
 def index_array2_larger(array1, array2):
+    import numpy as np
     for i in range(len(array1)):
-
-        a = array1[i]
-        b = array2[i]
-
-        if b > a:
+        if array1[i] < array2[i]:
             return i
 
 def wave_luminosity(finalstep, path=''):
@@ -485,6 +488,7 @@ def acc_luminosity_enthalpy(finalstep, path=''):
     A = cross_sec_area(shock_radius)
     #rho0 = np.array(upstream_quantity(finalstep, 'density', path))
     rho0 = np.array(downstream_quantity(finalstep, 'density', path))
+    c0 = np.array(downstream_quantity(finalstep, 'c_s', path))
 
     dv = velocity_jumps(finalstep, path)
     deps = np.abs(np.array(upstream_quantity(finalstep, 'eps', path))
@@ -492,9 +496,10 @@ def acc_luminosity_enthalpy(finalstep, path=''):
     dP = np.abs(np.array(upstream_quantity(finalstep, 'pressure', path))
         - np.array(downstream_quantity(finalstep, 'pressure', path)))
 
-    return A * (rho0 * (dv**2/2 + deps) + dP)
+    return A * (rho0 * (dv**2/2 + deps) + dP) # * c0
 
 def all_shock_eqn_plots():
+
     shock_eqn_plot(100000, False, 'Mach 0.5/')
     shock_eqn_plot(100000, True, 'Mach 0.75/')
     shock_eqn_plot(100000, True, 'Mach 1.0/')
@@ -503,29 +508,132 @@ def all_shock_eqn_plots():
     shock_eqn_plot(100000, True, 'Mach 1.75/')
     shock_eqn_plot(100000, True, 'Mach 2.0/')
 
-def phi_grav_out_array(finalstep, path=''):
-    # INCOMPLETE
+def infall_KE_comparison(mach_no='0.5'):
 
     import numpy as np
+    import matplotlib.pyplot as plt
 
-    u = read_output(finalstep, path)
+    from plots import units_dict
+    units = units_dict()
 
-    G = 6.674E-8 # Gravitational constant in cgs
+    t01 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,7]
+    KIN01 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,13]
 
-    radius = u[:,:,0]          # [cm]
-    density = u[:,:,1]        # [g/cm^3]
-    velocity = u[:,:,2]       # [cm/s]
-    time = u[:,0,7]           # [s]
+    t02 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,7]
+    KIN02 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,13]
 
-    shock_radius_indicies = np.array(extract_shocks(finalstep, path)[1])
+    t03 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,7]
+    KIN03 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,13]
 
-    #for one time step
+    t04 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,7]
+    KIN04 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,13]
 
-    radii_step = radius[0,:]
-    density_step = density[0,:]
-    shock_index = shock_radius_indicies[0]
+    t05 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,7]
+    KIN05 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,13]
 
-    #for i in range(len(radii_step[shock_index:])):
+    t06 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,7]
+    KIN06 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,13]
+
+    t07 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,7]
+    KIN07 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,13]
+
+    t08 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,7]
+    KIN08 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,13]
+
+    t09 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,7]
+    KIN09 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,13]
+
+    t10 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,7]
+    KIN10 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,13]
+
+    plt.plot(t01, KIN01, label='$Infall_{v} = 0.1 c_s $')
+    plt.plot(t02, KIN02, label='$Infall_{v} = 0.2 c_s $')
+    plt.plot(t03, KIN03, label='$Infall_{v} = 0.3 c_s $')
+    plt.plot(t04, KIN04, label='$Infall_{v} = 0.4 c_s $')
+    plt.plot(t05, KIN05, label='$Infall_{v} = 0.5 c_s $')
+    plt.plot(t06, KIN06, label='$Infall_{v} = 0.6 c_s $')
+    plt.plot(t07, KIN07, label='$Infall_{v} = 0.7 c_s $')
+    plt.plot(t08, KIN08, label='$Infall_{v} = 0.8 c_s $')
+    plt.plot(t09, KIN09, label='$Infall_{v} = 0.9 c_s $')
+    plt.plot(t10, KIN10, label='$Infall_{v} = 1.0 c_s $')
+
+    plt.legend(bbox_to_anchor=(1.02, 1))
+    plt.yscale('log')
+    plt.xlabel(units['time']) # set axes labels using dictionary containing units for each parameter
+    plt.ylabel(units['e_kinetic'])
+    plt.savefig('Mach_' + mach_no + '_KE_comparison.png', bbox_inches="tight", dpi=1200)
+    plt.show()
+
+    plt.close('all')
+
+def infall_final_KE():
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    from plots import units_dict
+    units = units_dict()
+
+    IN = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+
+    mach_no = '0.5'
+    M050 = [
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+    ]
+
+    mach_no = '0.75'
+    M075 = [
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+    ]
+
+    mach_no = '1.0'
+    M100 = [
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+    ]
+
+    plt.plot(IN, M050, label='Mach 0.5')
+    plt.plot(IN, M075, label='Mach 0.75')
+    plt.plot(IN, M100, label='Mach 1.0')
+
+    plt.legend(bbox_to_anchor=(1, 1))
+    plt.yscale('log')
+    plt.xlabel('$Infall_{v} / c_s$') # set axes labels using dictionary containing units for each parameter
+    plt.ylabel('Final ' + units['e_kinetic'])
+    plt.savefig('infall_shocks_finalKE', bbox_inches="tight", dpi=1200)
+    plt.show()
+
+    plt.close('all')
+
+
+
+
 
 
 

@@ -105,7 +105,9 @@ def energy_time_plot(finalstep, path=''):
     plt.xlabel(units['time']) # set axes labels using dictionary containing units for each parameter
     plt.ylabel('Energy [erg]')
     plt.savefig(path + 'time_energies.png', dpi=150)
-    plt.show()
+    #plt.show()
+
+    plt.close('all')
 
 def evolution_2D_plot(finalstep, stepsize, x='radius', y='density', path=''):
     """
@@ -130,7 +132,7 @@ def evolution_2D_plot(finalstep, stepsize, x='radius', y='density', path=''):
         plot(x, y, i, path, ev=True)
 
     plt.savefig(path + x + y + '_2D_evolution' + '.png', dpi=150)
-    plt.show()
+    #plt.show()
 
     plt.close('all')
 
@@ -198,7 +200,7 @@ def evolution_3D_plot(finalstep, z='density', zlog=True, path=''):
         ax.set_zlabel(units[z], fontsize=10)
 
     plt.savefig(path + z + '_3D_evolution' + '.png', dpi=150)
-    plt.show()
+    #plt.show()
 
     plt.close('all')
 
@@ -292,6 +294,8 @@ def make_everything(finalstep, path='', animations=True):
     evolution_3D_plot(finalstep, 'c_s', False, path)
     evolution_3D_plot(finalstep, 'mass_coord', False, path)
 
+    energy_time_plot(finalstep, path)
+
     if animations == True:
         animation(finalstep, 'density', path)
         animation(finalstep, 'velocity', path)
@@ -300,3 +304,38 @@ def make_everything(finalstep, path='', animations=True):
         animation(finalstep, 'c_s', path)
         animation(finalstep, 'mass_coord', path)
         animation(finalstep, 'phi', path)
+
+def infall_plots():
+
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.10/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.20/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.30/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.40/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.50/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.60/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.70/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.80/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN0.90/')
+    make_everything(100000, 'infall_profile_with_shock/M0.5IN1.00/')
+
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.10/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.20/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.30/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.40/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.50/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.60/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.70/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.80/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN0.90/')
+    make_everything(100000, 'infall_profile_with_shock/M0.75IN1.00/')
+
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.10/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.20/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.30/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.40/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.50/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.60/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.70/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.80/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN0.90/')
+    make_everything(100000, 'infall_profile_with_shock/M1.0IN1.00/')
