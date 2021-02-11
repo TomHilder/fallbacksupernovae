@@ -307,6 +307,7 @@ def make_everything(finalstep, path='', animations=True):
 
 def infall_plots():
 
+    """
     make_everything(100000, 'infall_profile_with_shock/M0.5IN0.10/')
     make_everything(100000, 'infall_profile_with_shock/M0.5IN0.20/')
     make_everything(100000, 'infall_profile_with_shock/M0.5IN0.30/')
@@ -339,3 +340,25 @@ def infall_plots():
     make_everything(100000, 'infall_profile_with_shock/M1.0IN0.80/')
     make_everything(100000, 'infall_profile_with_shock/M1.0IN0.90/')
     make_everything(100000, 'infall_profile_with_shock/M1.0IN1.00/')
+    """
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.10/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.20/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.30/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.40/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.50/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.60/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.70/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.80/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN0.90/')
+    make_everything(100000, 'infall_profile_with_shock/M1.25IN1.00/')
+
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.10/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.20/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.30/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.40/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.50/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.60/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.70/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.80/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN0.90/')
+    make_everything(100000, 'infall_profile_with_shock/M1.5IN1.00/')

@@ -618,9 +618,39 @@ def infall_final_KE():
         read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
+    mach_no = '1.25'
+    M125 = [
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+    ]
+
+    mach_no = '1.5'
+    M150 = [
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+    ]
+
     plt.plot(IN, M050, label='Mach 0.5')
     plt.plot(IN, M075, label='Mach 0.75')
     plt.plot(IN, M100, label='Mach 1.0')
+    plt.plot(IN, M125, label='Mach 1.25')
+    plt.plot(IN, M150, label='Mach 1.5')
 
     plt.legend(bbox_to_anchor=(1, 1))
     plt.yscale('log')

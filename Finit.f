@@ -145,10 +145,10 @@ c     ============================================================
 
 
       real, parameter :: r_dump = 2.0d0 * 1.5d8
-      real, parameter :: ma_sh = 0.75
-      real, parameter :: infall_v_frac = 0.1
+      real, parameter :: ma_sh = 1.50
+      real, parameter :: infall_v_frac = 1.0
 
-      ! set to 0 for not initially collapsing, set to 1 for initially collapsing
+      ! set to 0 for not initially collapsing, set to 1 for initially collapsing, set to 2 for split infall profile
       real, parameter :: infall = 1
 
       ! set to 0 to use infall v as fraction of esc_v, and 1 for fraction of sound speed
@@ -221,6 +221,31 @@ c     set in-falling material velocity profile:
           use_v = sound_v
         end if
         !print*,'use_v = ',use_v
+        do k=1,1
+          do j=1,1
+            do i=1,800
+              u(i,j,k,1)=-1 * u(i,j,k,0) * infall_v_frac * use_v *
+     &             (r(i) / r_dump)**(-2.)
+              if (r(i) .gt. r_dump) then
+                u(i,j,k,4)=u(i,j,k,4) + 0.5 * u(i,j,k,1)**2 / u(i,j,k,0)
+              end if
+            end do
+          end do
+        end do
+      end if
+
+c     set in-falling material split velocity profile
+      if (infall .eq. 2) then
+        esc_v = sqrt(6.674E-8 * 1.988E33 * 32 / r_dump)
+        sound_v = sqrt(gamma_e*
+     &       (gamma_e-1.0)*u(dump_i,1,1,4)/u(dump_i,1,1,0))
+        print*,'esc_v = ', esc_v
+        print*,'sound_v = ', sound_v
+        print*,'sound_v/esc_v= ', sound_v/esc_v
+        use_v = esc_v
+        if (use_sound .eq. 1) then
+          use_v = sound_v
+        end if
         do k=1,1
           do j=1,1
             do i=1,800
