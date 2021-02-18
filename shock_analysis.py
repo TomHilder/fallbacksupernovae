@@ -1,4 +1,4 @@
-# Functions for finding shock in output of hydro code
+# Functions for analysis of output of hydro code
 # Created by Tom Hilder for PHS3350 fallback supernovae project
 
 def read_output(finalstep, path=''):
@@ -508,7 +508,7 @@ def all_shock_eqn_plots():
     shock_eqn_plot(100000, True, 'Mach 1.75/')
     shock_eqn_plot(100000, True, 'Mach 2.0/')
 
-def infall_KE_comparison(mach_no='0.5'):
+def infall_KE_comparison(mach_no='0.5', split=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -516,57 +516,64 @@ def infall_KE_comparison(mach_no='0.5'):
     from plots import units_dict
     units = units_dict()
 
-    t01 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,7]
-    KIN01 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,13]
+    if split==True:
+        j = 'split_'
+    else:
+        j = ''
 
-    t02 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,7]
-    KIN02 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,13]
+    t01 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,7]
+    KIN01 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[:,0,13]
 
-    t03 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,7]
-    KIN03 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,13]
+    t02 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,7]
+    KIN02 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[:,0,13]
 
-    t04 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,7]
-    KIN04 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,13]
+    t03 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,7]
+    KIN03 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[:,0,13]
 
-    t05 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,7]
-    KIN05 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,13]
+    t04 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,7]
+    KIN04 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[:,0,13]
 
-    t06 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,7]
-    KIN06 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,13]
+    t05 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,7]
+    KIN05 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[:,0,13]
 
-    t07 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,7]
-    KIN07 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,13]
+    t06 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,7]
+    KIN06 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[:,0,13]
 
-    t08 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,7]
-    KIN08 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,13]
+    t07 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,7]
+    KIN07 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[:,0,13]
 
-    t09 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,7]
-    KIN09 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,13]
+    t08 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,7]
+    KIN08 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[:,0,13]
 
-    t10 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,7]
-    KIN10 = read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,13]
+    t09 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,7]
+    KIN09 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[:,0,13]
 
-    plt.plot(t01, KIN01, label='$Infall_{v} = 0.1 c_s $')
-    plt.plot(t02, KIN02, label='$Infall_{v} = 0.2 c_s $')
-    plt.plot(t03, KIN03, label='$Infall_{v} = 0.3 c_s $')
-    plt.plot(t04, KIN04, label='$Infall_{v} = 0.4 c_s $')
-    plt.plot(t05, KIN05, label='$Infall_{v} = 0.5 c_s $')
-    plt.plot(t06, KIN06, label='$Infall_{v} = 0.6 c_s $')
-    plt.plot(t07, KIN07, label='$Infall_{v} = 0.7 c_s $')
-    plt.plot(t08, KIN08, label='$Infall_{v} = 0.8 c_s $')
-    plt.plot(t09, KIN09, label='$Infall_{v} = 0.9 c_s $')
-    plt.plot(t10, KIN10, label='$Infall_{v} = 1.0 c_s $')
+    t10 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,7]
+    KIN10 = read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[:,0,13]
+
+    plt.close('all')
+
+    plt.plot(t01, KIN01, label='$K = 0.1$')
+    plt.plot(t02, KIN02, label='$K = 0.2$')
+    plt.plot(t03, KIN03, label='$K = 0.3$')
+    plt.plot(t04, KIN04, label='$K = 0.4$')
+    plt.plot(t05, KIN05, label='$K = 0.5$')
+    plt.plot(t06, KIN06, label='$K = 0.6$')
+    plt.plot(t07, KIN07, label='$K = 0.7$')
+    plt.plot(t08, KIN08, label='$K = 0.8$')
+    plt.plot(t09, KIN09, label='$K = 0.9$')
+    plt.plot(t10, KIN10, label='$K = 1.0$')
 
     plt.legend(bbox_to_anchor=(1.02, 1))
     plt.yscale('log')
     plt.xlabel(units['time']) # set axes labels using dictionary containing units for each parameter
     plt.ylabel(units['e_kinetic'])
-    plt.savefig('Mach_' + mach_no + '_KE_comparison.png', bbox_inches="tight", dpi=1200)
+    plt.savefig(j + 'Mach_' + mach_no + '_KE_comparison.pdf', bbox_inches="tight")
     plt.show()
 
     plt.close('all')
 
-def infall_final_KE():
+def infall_final_KE(split=False):
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -574,89 +581,94 @@ def infall_final_KE():
     from plots import units_dict
     units = units_dict()
 
+    if split==True:
+        j = 'split_'
+    else:
+        j = ''
+
     IN = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
 
     mach_no = '0.5'
     M050 = [
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
     mach_no = '0.75'
     M075 = [
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
     mach_no = '1.0'
     M100 = [
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
     mach_no = '1.25'
     M125 = [
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
     mach_no = '1.5'
     M150 = [
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
-        read_output(100000, 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.10/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.20/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.30/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.40/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.50/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.60/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.70/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.80/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN0.90/')[-1,0,13],
+        read_output(100000, j + 'infall_profile_with_shock/M' + mach_no + 'IN1.00/')[-1,0,13]
     ]
 
-    plt.plot(IN, M050, label='Mach 0.5')
-    plt.plot(IN, M075, label='Mach 0.75')
-    plt.plot(IN, M100, label='Mach 1.0')
-    plt.plot(IN, M125, label='Mach 1.25')
-    plt.plot(IN, M150, label='Mach 1.5')
+    plt.plot(IN, M050, label='$M = 0.5$')
+    plt.plot(IN, M075, label='$M = 0.75$')
+    plt.plot(IN, M100, label='$M = 1.0$')
+    plt.plot(IN, M125, label='$M = 1.25$')
+    plt.plot(IN, M150, label='$M = 1.5$')
 
     plt.legend(bbox_to_anchor=(1, 1))
     plt.yscale('log')
-    plt.xlabel('$Infall_{v} / c_s$') # set axes labels using dictionary containing units for each parameter
+    plt.xlabel('$K$') # set axes labels using dictionary containing units for each parameter
     plt.ylabel('Final ' + units['e_kinetic'])
-    plt.savefig('infall_shocks_finalKE', bbox_inches="tight", dpi=1200)
+    plt.savefig(j + 'infall_shocks_finalKE.pdf', bbox_inches="tight")
     plt.show()
 
     plt.close('all')
